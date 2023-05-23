@@ -5,7 +5,6 @@ TARGET = GettingStarted
 CPP_SOURCES = GettingStarted.cpp \
 $(wildcard Effect/*.cpp) \
 $(wildcard Ui/Page/*.cpp) \
-#$(wildcard Ui/Color/*.cpp)
 
 
 # Library Locations

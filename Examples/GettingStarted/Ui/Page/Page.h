@@ -1,19 +1,29 @@
-#include "../libDaisy/src/hid/rgb_led.h"
-#include "../Color/Color.h"
+#pragma once
+#ifndef PAGE_H
+#define PAGE_H
+
+#include "daisy_pod.h"
+#include "..\..\Effect\AbstractEffect.h"
+
+using namespace daisy;
 
 class Page
 {
    public:
-        Page(Color PageColor, int nSubPageCount);
+        Page(DaisyPod *hwRef, Color* PageColor, AbstractEffect* fx);
         ~Page() {}
-
-        //void SetKnobParameters(int nK1, int nK1);
-        void UpdateSubPage(int nPageIncrement);
+        void ProcessIo();
         void UpdateLeds();
-        float Process(float fIn);
-    private:
-        int _subPageCount;
-        int _subPage = 0;
-        Color _c;
+        float ProcessAudio(float fIn);
 
+    private:
+        AbstractEffect* _fx;
+        Color* _mainPageColor;
+        Color* _subPageColor;
+        DaisyPod* _hwRef;
+        RgbLed* _mainPageLed;
+        RgbLed* _subPageLed;
+        
 };
+
+#endif /* PAGE_H */

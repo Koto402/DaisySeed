@@ -1,6 +1,6 @@
 #pragma once
-#ifndef ABSTRACT_CLASS_H
-#define ABSTRACT_CLASS_H
+#ifndef ABSTRACT_EFFECT_H
+#define ABSTRACT_EFFECT_H
 
 
 class AbstractEffect
@@ -12,4 +12,4 @@ class AbstractEffect
 };
 
 
-#endif /* ABSTRACT_CLASS_H */
+#endif /* ABSTRACT_EFFECT_H */
