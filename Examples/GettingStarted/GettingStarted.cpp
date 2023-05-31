@@ -10,25 +10,6 @@ using namespace daisysp;
 
 DaisyPod hw;
 
-Color::PresetColor PresetColors[] = 
-{
-	Color::PresetColor::RED,
-	Color::PresetColor::BLUE,
-	Color::PresetColor::GREEN,
-};
-
-Color* ColorObjects[ARRAY_DIM(PresetColors)];
-
-static void InitColors()
-{
-	for (int i = 0; i < ARRAY_DIM(ColorObjects); i++)
-	{
-		ColorObjects[i] = new Color();
-		ColorObjects[i]->Init(PresetColors[i]);
-	}
-}
-
-
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
 {
 	hw.ProcessAllControls();
@@ -46,9 +27,6 @@ int main(void)
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 	
 	AbstractEffect* delay = new Delay();
-	InitColors();
-	Page DelayPage = Page(&hw, ColorObjects[1], delay);
-	DelayPage.UpdateLeds();
 	hw.StartAdc();
 	hw.StartAudio(AudioCallback);
 	while(1) {}
