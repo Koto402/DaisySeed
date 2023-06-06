@@ -1,5 +1,24 @@
 #include "UiCurator.h"
+#include "src/util/color.h"
+#include "../../Util/Util.h"
 
+Color::PresetColor PresetColors[] = 
+{
+	Color::PresetColor::RED,
+	Color::PresetColor::BLUE,
+	Color::PresetColor::GREEN,
+};
+
+Color* ColorObjects[ARRAY_DIM(PresetColors)];
+
+static void InitColors()
+{
+	for (int i = 0; i < ARRAY_DIM(ColorObjects); i++)
+	{
+		ColorObjects[i] = new Color();
+		ColorObjects[i]->Init(PresetColors[i]);
+	}
+}
 
 UiCurator::UiCurator()
 {

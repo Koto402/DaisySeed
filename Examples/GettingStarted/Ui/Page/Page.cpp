@@ -13,6 +13,7 @@ Page::Page(DaisyPod *hwRef, Color* PageColor, AbstractEffect* fx)
 
 void Page::ProcessIo()
 {
+    _hwRef->ProcessAllControls();
     return;
 }
 
@@ -21,9 +22,12 @@ void Page::UpdateLeds()
     _mainPageLed->SetColor(*_mainPageColor);
     _subPageLed->SetColor(*_subPageColor);
     _hwRef->UpdateLeds();
+    return;
 }
 
 float Page::ProcessAudio(float fIn)
 {
-    return 0;
+    float fOut;
+    _fx->ProcessMono(fIn, fOut);
+    return fOut;
 }
