@@ -1,28 +1,29 @@
 #include <daisy_pod.h>
-#include "daisysp.h"
+#include <daisysp.h>
+
+#include "Filters/moogladder.h"
 #include "Effect/Delay.h"
 #include "Effect/AbstractEffect.h"
+
 #include "Ui/Page/Page.h"
-#include "util/util.h"
-#include "Filters/moogladder.h"
+#include "Ui/UiCurator/UiCurator.h"
 
 using namespace daisy;
 using namespace daisysp;
 
-DaisyPod hw;
-
 
 Delay<float, 48000>* delay = new Delay<float, 48000>;
 MoogLadder filt;
-Page *DelayPage;
+
+DaisyPod hw;
+UiCurator* UiPtr = UiCurator::GetInstance();
 
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
 {
 	static float knob_val_1 = 0;
 	static float knob_val_2 = 0;
-
 	/* Handle IO */
-	DelayPage->ProcessIo();
+	UiPtr->ProcessIo();
 	
 	knob_val_1 = hw.GetKnobValue(hw.KNOB_1);	
  	knob_val_2 = hw.GetKnobValue(hw.KNOB_2);
@@ -54,7 +55,7 @@ int main(void)
 	hw.Init();
 	hw.SetAudioBlockSize(4); // number of samples handled per callback
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
-	DelayPage.UpdateLeds();
+	UiPtr->UpdateLeds();
 	hw.StartAdc();
 	hw.StartAudio(AudioCallback);
 	

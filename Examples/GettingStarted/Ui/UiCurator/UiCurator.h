@@ -10,16 +10,22 @@
 class UiCurator
 {
     public:
-        static UiCurator* GetInstance();
+
+        //UiCurator(UiCurator &other) = delete;
+        //void operator=(const UiCurator &) = delete;
+
+
         void ProcessIo();
         void UpdateLeds();
+        static UiCurator *GetInstance();
 
     protected:    
         UiCurator();
         static UiCurator* _uiCurator;
-    
+
     private:
         void InitPageColors();
+        
 };
 
 
