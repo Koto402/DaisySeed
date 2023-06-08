@@ -3,6 +3,7 @@
 #define PAGE_H
 
 #include "daisy_pod.h"
+#include "src/util/color.h"
 #include "..\..\Effect\AbstractEffect.h"
 
 using namespace daisy;
@@ -10,20 +11,16 @@ using namespace daisy;
 class Page
 {
    public:
-        Page(DaisyPod *hwRef, Color* PageColor, AbstractEffect* fx);
+        Page(AbstractEffect* fx);
         ~Page() {}
-        void ProcessIo();
-        void UpdateLeds();
-        float ProcessAudio(float fIn);
-
+        AbstractEffect* GetEffect();
+        void UpdateSubPage(int increment);
     private:
+        uint8_t _nSubPage;
         AbstractEffect* _fx;
-        Color* _mainPageColor;
-        Color* _subPageColor;
-        DaisyPod* _hwRef;
+        Color c;
         RgbLed* _mainPageLed;
         RgbLed* _subPageLed;
-        
 };
 
 #endif /* PAGE_H */

@@ -25,7 +25,7 @@ class Delay : public AbstractEffect
             _fb = 0.5;
             _delay = 100;
             _frac = 0.0f;
-            _numParameters = 0;
+            numParameters = 2;
         }
 
         void ClearDDL()
@@ -62,6 +62,19 @@ class Delay : public AbstractEffect
 
         void SetParameterValues(int parameterset, int nVal1, int nVal2)
         {
+            switch(parameterset)
+            {
+                case 0:
+                    _delay = nVal2;
+                    break;
+                case 1:
+                    _fb = nVal2;
+                    break;
+                default:
+                    _delay = nVal2;
+                break;
+            }
+            _dry = nVal1;
             return;
         }
         void SetDryLevel(float dry) 

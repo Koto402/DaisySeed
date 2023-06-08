@@ -1,33 +1,18 @@
 #include "Page.h"
 
 
-Page::Page(DaisyPod *hwRef, Color* PageColor, AbstractEffect* fx)
+Page::Page(AbstractEffect* fx)
 {
-    _mainPageColor = PageColor;
-    _subPageColor = PageColor;
-    _hwRef = hwRef;
-    _mainPageLed = &(_hwRef->led1);
-    _subPageLed = &(_hwRef->led2);
     _fx = fx;
+    _nSubPage = 0;
 }
 
-void Page::ProcessIo()
+AbstractEffect* Page::GetEffect()
 {
-    _hwRef->ProcessAllControls();
-    return;
+    return _fx;
 }
 
-void Page::UpdateLeds()
+void Page::UpdateSubPage(int increment)
 {
-    _mainPageLed->SetColor(*_mainPageColor);
-    _subPageLed->SetColor(*_subPageColor);
-    _hwRef->UpdateLeds();
-    return;
-}
-
-float Page::ProcessAudio(float fIn)
-{
-    float fOut;
-    _fx->ProcessMono(fIn, fOut);
-    return fOut;
+    _nSubPage = increment;
 }

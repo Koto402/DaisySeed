@@ -15,9 +15,11 @@ class AbstractEffect
             _dry = (dry < 0)  ? 0 : dry;
         }
 
+        int numParameters;
+
     protected: 
         float _dry = 0.5;
-        int _numParameters;      
+      
     private:
 
 };
