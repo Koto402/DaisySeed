@@ -58,6 +58,6 @@ int main(void)
 	UiPtr->UpdateLeds();
 	hw.StartAdc();
 	hw.StartAudio(AudioCallback);
-	
+	// git test //
 	while(1) {/* Run forever */ }
 }
