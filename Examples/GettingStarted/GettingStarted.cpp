@@ -13,41 +13,54 @@ using namespace daisysp;
 
 #define MONO
 
-
-MoogLadder filt;
 UiCurator* UiPtr = UiCurator::GetInstance();
+DaisyPod hw;
 
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
 {
 	/* Handle IO */
 	UiPtr->ProcessIo();
 
-	//delay->SetFeedback(knob_val_2);
-	//filt.SetFreq(knob_val_2 * 3000);
-
 	for (size_t i = 0; i < size; i++)
 	{
-		UiPtr->ProcessAudio(in[0][i], out[0][i]);
-
 		#ifdef MONO
+			//Mono processes the left input and copies it to the left and right output
+//			UiPtr->ProcessAudio(in[0][i], out[0][i]);
 			out[1][i] = out[0][i];
 		#else
+			//Stereo processing
 			UiPtr->ProcessAudio(in[0][i], out[0][i]);
+			UiPtr->ProcessAudio(in[1][i], out[1][i]);
 		#endif
-		
-		//out[0][i] = filt.Process(out[0][i]);
-		//out[0][i] = filt.Process(in[0][i]);
-		
 	}
 }
+
+//Declare audio effects and apply them to a set of pages
 Delay<float, 48000>* myDelay = new Delay<float, 48000>;
-Delay<float, 48000>* myDelay2 = new Delay<float, 48000>;
-//AbstractEffect* myLongerDelay = new Delay<float, 192000>;
+//Delay<float, 96000>* myLongerDelay = new Delay<float, 96000>;
+
+Page* p1 = new Page(myDelay);
+
+//Page p1(myDelay);
+//Page p2(myLongerDelay);
 
 int main(void)
 {
-	UiPtr->InitHw(AudioCallback);
-	UiPtr->AddFx(myDelay);
-	UiPtr->AddFx(myDelay2);
-	while(1) {/* Run forever */ }
+	hw.Init();
+	hw.SetAudioBlockSize(4); // number of samples handled per callback
+	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
+	hw.StartAdc();
+//	hw.StartAudio(AudioCallback);
+
+	UiPtr->SetHwRef(&hw);
+
+	UiPtr->AddPage(p1);
+//	UiPtr->AddPage(p2);
+
+	
+	while(1) 
+	{
+		/* Run forever */ 
+		UiPtr->ProcessIo();
+	}
 }

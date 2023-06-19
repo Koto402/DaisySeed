@@ -1,34 +1,23 @@
-
-#include "src/util/color.h"
 #include "../../Util/Util.h"
 #include "UiCurator.h"
 
-
-Color::PresetColor PresetColors[] = 
+static Color::PresetColor PresetColors[] = 
 {
-	Color::PresetColor::RED,
-	Color::PresetColor::BLUE,
-	Color::PresetColor::GREEN,
+    Color::PresetColor::RED,
+    Color::PresetColor::BLUE,
+    Color::PresetColor::GREEN,
+    Color::PresetColor::WHITE,  
+    Color::PresetColor::PURPLE, 
+    Color::PresetColor::CYAN,   
+    Color::PresetColor::GOLD,   
 };
 
-Color* ColorObjects[ARRAY_DIM(PresetColors)];
-
-UiCurator::UiCurator()
+UiCurator::UiCurator() : _pageList()
 {
-    _mainPageLed = &_hw.led1;
-    _subPageLed = &_hw.led2;
+    _mainPageLed = &_hw->led1;
+    _subPageLed = &_hw->led2;
     InitPageColors();
-    nCurrentPage = 0;
-
-}
-
-void UiCurator::InitHw(AudioHandle::AudioCallback cb)
-{
-    _hw.Init();
-	_hw.SetAudioBlockSize(4); // number of samples handled per callback
-	_hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
-	_hw.StartAdc();
-	_hw.StartAudio(cb);
+    pageIt = _pageList.begin();
 }
 
 UiCurator* UiCurator::_uiCurator = nullptr;
@@ -42,67 +31,96 @@ UiCurator* UiCurator::GetInstance()
     return (_uiCurator);
 }
 
+void UiCurator::SetHwRef(DaisyPod* hw)
+{
+    _hw = hw;
+}
+
 void UiCurator::InitPageColors()
 {
-	for (size_t i = 0; i < ARRAY_DIM(ColorObjects); i++)
+	for (size_t i = 0; i < ARRAY_DIM(PresetColors); i++)
 	{
-		ColorObjects[i] = new Color();
-		ColorObjects[i]->Init(PresetColors[i]);
+		_colorPtrs.push_back(new Color());
+        _colorPtrs[i]->Init(PresetColors[i]);
 	}
 }
 
 void UiCurator::ProcessIo()
 {
-    _hw.ProcessAllControls();
+    _hw->ProcessAllControls();
 
     UpdatePage();
-    float knob_val_1 = _hw.GetKnobValue(_hw.KNOB_1);	
- 	float knob_val_2 = _hw.GetKnobValue(_hw.KNOB_2);
+    (*pageIt)->UpdateLeds();
+    float knob_val_1 = _hw->GetKnobValue(_hw->KNOB_1);	
+ 	float knob_val_2 = _hw->GetKnobValue(_hw->KNOB_2);
     
-    //AbstractEffect* fxPtr = _fxList[nCurrentFx];
-    //fxPtr->SetParameterValues(nSubPage, knob_val_1, knob_val_2);
-
-    //_pageList[nCurrentPage]._fx->SetParameterValues(nSubPage,)
+    AbstractEffect* pFx = (*pageIt)->GetEffect();
+    pFx->SetParameterValues((*pageIt)->GetSubPage(), knob_val_1, knob_val_2);
     return;
 }
 
 void UiCurator::ProcessAudio(float fIn, float &fOut)
 {
-    AbstractEffect* pFx = _pageList[nCurrentPage].GetEffect();
+    AbstractEffect* pFx = (*pageIt)->GetEffect();
     pFx->ProcessMono(fIn,fOut);
 }
 
 void UiCurator::UpdatePage()
 {
-    int increment = _hw.encoder.Increment();
+    int increment = _hw->encoder.Increment();
     if(increment == 0)
         return;
 
-    nCurrentPage += increment;
-    int max_size = _pageList.size();
-    nCurrentPage = (nCurrentPage >= max_size) ? max_size - 1 : nCurrentPage;
-    nCurrentPage = (nCurrentPage < 0) ? 0 : nCurrentPage;
-    _mainPageLed->SetColor(*ColorObjects[nCurrentPage]);
-    _mainPageLed->Update();
+    if((increment == 1) && (pageIt != _pageList.end()))
+    {
+        pageIt++;
+    }
+    else if((increment == -1) && (pageIt != _pageList.begin()))
+    {
+        pageIt--;
+    }
+    
+    (*pageIt)->UpdateLeds();
 }
 
 void UiCurator::UpdateSubPage()
 { 
     //If only one button was pressed 
-    if(_hw.button1.RisingEdge() ^ _hw.button2.RisingEdge())
-    {
-        int IncrementVal = 0;
-        IncrementVal = _hw.button1.RisingEdge() ? (-1) : (1);
-        _pageList[nCurrentPage].UpdateSubPage(IncrementVal);
-    }
+    if(!(_hw->button1.RisingEdge() ^ _hw->button2.RisingEdge()))
+        return;
+    
+
+    int incrementVal = _hw->button1.RisingEdge() ? (-1) : 1;
+    (*pageIt)->UpdateSubPage(incrementVal);
 }
 
-void UiCurator::AddFx(AbstractEffect* fxPtr)
+void UiCurator::AddPage(Page* page)
 {
-    _pageList.push_back(fxPtr);
+    _pageList.push_back(page);
+    page->SetColors(GetNextColor(), &_colorPtrs);
+    page->SetLedPtrs(_mainPageLed, _subPageLed);
+    //if this was the first page to be added
+    if(_pageList.size() == 1)
+    {
+        pageIt = _pageList.begin();
+    }
 }
 
 void UiCurator::UpdateLeds()
 {
     return;
+}
+
+Color* UiCurator::GetNextColor()
+{
+    static size_t current_color = 0;
+    Color* colorPtr = _colorPtrs[current_color];
+    current_color++;
+    
+    if(current_color >= _colorPtrs.size())
+    {
+        current_color = 0;
+    }
+    
+    return colorPtr;
 }

@@ -64,10 +64,10 @@ class Delay : public AbstractEffect
         {
             switch(parameterset)
             {
-                case 0:
+                case ParameterSet_DelayLength:
                     _delay = nVal2;
                     break;
-                case 1:
+                case ParameterSet_DelayFeedback:
                     _fb = nVal2;
                     break;
                 default:
