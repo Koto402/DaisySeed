@@ -22,7 +22,7 @@ class UiCurator
         void ProcessIo();
         void UpdateLeds();
         void ProcessAudio(float fIn, float &fOut);
-        void AddPage(Page page);
+        void AddPage(Page* page);
         static UiCurator *GetInstance();
         void SetHwRef(DaisyPod* hw);
 
