@@ -4,6 +4,7 @@ TARGET = GettingStarted
 # Sources
 CPP_SOURCES = GettingStarted.cpp \
 $(wildcard Effect/*.cpp) \
+$(wildcard SynthVoice/*.cpp)\
 $(wildcard Ui/Page/*.cpp) \
 $(wildcard Ui/UiCurator/*.cpp)\
 

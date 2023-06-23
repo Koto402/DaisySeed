@@ -74,7 +74,9 @@
         "xhash": "cpp",
         "xstring": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "xlocnum": "cpp",
+        "xtr1common": "cpp"
     },
     "editor.tokenColorCustomizations": {
         "textMateRules": [
